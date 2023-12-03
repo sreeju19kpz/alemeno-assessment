@@ -1,25 +1,61 @@
-import logo from './logo.svg';
-import './App.css';
-
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import "./App.css";
+import Layout from "./Layout";
+import "./server";
+import { Suspense } from "react";
+import Courses from "./Pages/Courses";
+import CourseDetails, { loader as cLoader } from "./Pages/CourseDetails";
+import { Box, CircularProgress } from "@mui/material";
+import UserWindow from "./Pages/UserWindow";
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
+  const router = createBrowserRouter([
+    {
+      path: "/",
+      element: (
+        <Suspense
+          fallback={
+            <div className="default width-100-p hei-300-px ali-ite-cnt justify-con-cnt">
+              <Box sx={{ display: "flex" }}>
+                <CircularProgress />
+              </Box>
+            </div>
+          }
         >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+          <Layout />
+        </Suspense>
+      ),
+      errorElement: <>{"somethomg Went wrong plz reload again"}</>,
+      children: [
+        {
+          path: "/",
+          element: (
+            <Suspense fallback={<></>}>
+              <Courses />
+            </Suspense>
+          ),
+        },
+        {
+          path: "/search",
+          element: (
+            <Suspense fallback={<></>}>
+              <Courses />
+            </Suspense>
+          ),
+        },
+        {
+          path: "/course/:id",
+          element: <CourseDetails />,
+          loader: ({ params }) => cLoader(params.id),
+        },
+        {
+          path: "/profile/:id",
+          element: <UserWindow />,
+          // loader: ({ params }) => cLoader(params.id),
+        },
+      ],
+    },
+  ]);
+  return <RouterProvider router={router} />;
 }
 
 export default App;
